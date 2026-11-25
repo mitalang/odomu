@@ -1,0 +1,7 @@
+; odomu.mita — MITA standard library loader
+; Generic Lisp functions, no HTTP/network logic.
+
+(movoin "core.mita")
+(movoin "macros.mita")
+(movoin "lib.mita")
+(movoin "seq.mita")

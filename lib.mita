@@ -1,0 +1,43 @@
+; lib.mita — sort and hash-table helpers
+
+; sequence helpers for sorting
+(sada (
+  (tigatake (muhe (n lst)
+    (ka (shato n 0) '()
+        (ka (nyasi lst) '()
+            (upa (lawa lst) (tigatake (lata n 1) (kucha lst)))))))
+
+  (tigadrop (muhe (n lst)
+    (ka (shato n 0) lst
+        (ka (nyasi lst) '()
+            (tigadrop (lata n 1) (kucha lst))))))
+
+  (tigadada-merge (muhe (a b less?)
+    (ka (nyasi a) b
+        (ka (nyasi b) a
+            (ka (muhemovo less? (lawa a) (lawa b))
+                (upa (lawa a) (tigadada-merge (kucha a) b less?))
+                (upa (lawa b) (tigadada-merge a (kucha b) less?)))))))
+
+  (tigadada-sort (muhe (lst less?)
+    (ka (nyasi lst) '()
+        (ka (nyasi (kucha lst)) lst
+            (zido ((mid (gusha (tigamani lst) du))
+                   (left (tigadada-sort (tigatake mid lst) less?))
+                   (right (tigadada-sort (tigadrop mid lst) less?)))
+              (tigadada-merge left right less?))))))
+
+  ; sort a list; default comparator is numeric <
+  (tigadada (muhe (lst . cmp)
+    (zido ((less? (ka (nyasi cmp) aba (lawa cmp))))
+      (tigadada-sort lst less?))))
+
+  ; hash-table <-> association-list helpers
+  (mitotiga (muhe (h)
+    (si (muhe (k) (upa k (hash-ref h k))) (hash-keys h))))
+
+  (tigamito (muhe (pairs)
+    (zido ((h (make-hash-table)))
+      (in (tigadomu p pairs (hash-set! h (lawa p) (kucha p)))
+          h))))
+))

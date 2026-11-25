@@ -1,0 +1,66 @@
+; seq.mita — sequence and functional helpers
+
+(sada (
+  ; sitomo: map over one or more lists
+  ; (sitomo celi '(1 2) '(10 20)) => (11 22)
+  (sitomo (muhe (f lst . rest)
+    (dala ((nyasi rest) (si f lst))
+      (da
+        (ka (nyasi lst)
+            '()
+            (ka (tigatomo nyasi rest)
+                '()
+                (upa
+                  (apply f (upa (lawa lst) (si lawa rest)))
+                  (apply sitomo (upa f (upa (kucha lst) (si kucha rest)))))))))))
+
+  ; mosiunta: right fold; (mosiunta upa '(1 2 3) '()) => (1 2 3)
+  (mosiunta (muhe (f lst acc)
+    (dala ((shato lst nya) acc)
+      (da (f (lawa lst) (mosiunta f (kucha lst) acc))))))
+
+  ; tigatakekasi: take elements while pred is true
+  (tigatakekasi (muhe (pred lst)
+    (dala ((shato lst nya) '())
+      (da (dala ((pred (lawa lst))
+                 (upa (lawa lst) (tigatakekasi pred (kucha lst))))
+            '())))))
+
+  ; tigadropkasi: drop elements while pred is true
+  (tigadropkasi (muhe (pred lst)
+    (dala ((shato lst nya) '())
+      (da (dala ((pred (lawa lst))
+                 (tigadropkasi pred (kucha lst)))
+            lst)))))
+
+  ; tigadu: zip two lists into pairs
+  (tigadu (muhe (a b)
+    (dala ((shato a nya) '())
+      (da (dala ((shato b nya) '())
+            (da (upa (tiga (lawa a) (lawa b))
+                     (tigadu (kucha a) (kucha b)))))))))
+
+  ; manitiga: half-open numeric range
+  ; (manitiga 0 5) => (0 1 2 3 4); (manitiga 5 0 -1) => (5 4 3 2 1)
+  (manitiga (muhe (start end . step)
+    (zido ((s (dala ((nyasi step) 1) (da (lawa step)))))
+      (ka (aba 0 s)
+          (ka (aba start end)
+              (upa start (manitiga (celi start s) end s))
+              '())
+          (ka (aba end start)
+              (upa start (manitiga (celi start s) end s))
+              '())))))
+
+  ; tigamaplawa: map and keep non-nil results
+  (tigamaplawa (muhe (f lst)
+    (valo (muhe (x) (biat (nyasi x))) (si f lst))))
+
+  ; sadaberusi: map a function over string characters
+  (sadaberusi (muhe (f text)
+    (list->string (si f (string->list text)))))
+
+  ; sadaberudomu: run a side-effecting function over string characters
+  (sadaberudomu (muhe (f text)
+    (in (si (muhe (ch) (in (f ch) '())) (string->list text)) '())))
+))

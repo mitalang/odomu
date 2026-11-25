@@ -1,0 +1,37 @@
+; macros.mita — VM macros
+
+; VM-only macros. The tree interpreter ignores samasada and keeps using the
+; function definitions above for compatibility.
+(samasada kasi (cond body) `(ka ,cond ,body nye))
+(samasada nyekasi (cond body) `(ka ,cond nye ,body))
+
+; Short-circuit macros for and/or. The function definitions above are kept
+; for tree compatibility and for use as first-class values.
+(samasada kuzitomo args
+  (zido ((build (muhe (xs)
+    (dala ((shato xs nya) 'da)
+          ((shato (kucha xs) nya) (lawa xs))
+          (da (zido ((v (gensym)))
+                `(zido ((,v ,(lawa xs)))
+                   (ka ,v ,(build (kucha xs)) ,v))))))))
+    (build args)))
+
+(samasada todo args
+  (zido ((build (muhe (xs)
+    (dala ((shato xs nya) 'nye)
+          ((shato (kucha xs) nya) (lawa xs))
+          (da (zido ((v (gensym)))
+                `(zido ((,v ,(lawa xs)))
+                   (ka ,v ,v ,(build (kucha xs))))))))))
+    (build args)))
+
+; handler-case: platasi with a more conventional argument order
+(samasada handler-case (body var handler)
+  `(platasi (muhe (,var) ,handler) ,body))
+
+; for: iterate over a list, binding var for each element
+(samasada tigadomu (var lst body)
+  `(zido loop ((rest ,lst))
+     (ka (nyasi rest) '()
+         (in (zido ((,var (lawa rest))) ,body)
+             (loop (kucha rest))))))
